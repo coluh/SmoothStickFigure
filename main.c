@@ -1,36 +1,15 @@
-#include <stdio.h>
-#include <raylib.h>
-#include <raymath.h>
-#define ARMLEN 80
-#define LEGLEN 100
-#define THICKNESS 20
-#define SCREENWIDTH 2100
-#define SCREENHEIGHT 900
-struct STICK {
-	double headV;			/*    (_)  80	*/
-	Vector2 neck;			/*	   |   *5	*/
-	double elbowLeftV;		/*   / |		*/
-	double handLeftV;		/*  |  |		*/
-	double elbowRightV;		/*     | \		*/
-	double handRightV;		/*     |  |		*/
-	Vector2 center;			/*     |  100	*/
-	double kneeLeftV;		/*    /	   *5	*/
-	double footLeftV;		/*   |			*/
-	double kneeRightV;		/*       \	    */
-	double footRightV;		/*        |	    */
-	Color color;
-} player;
-void initStick();
-void drawStick();
-void detectFalling() {
-	//
-};
+#include "main.h"
+static bool b1 = true, b2 = false, b3 = false;
+struct STICK player;
+struct STICK status = { 0 };	//每帧的变化量
 int main() {
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "StickFigure");
 	SetTraceLogLevel(LOG_WARNING);
 	SetTargetFPS(60);
 	initStick();
 	while (!WindowShouldClose()) {
+		getInput();
+		calculateStick();
 		BeginDrawing();
 		ClearBackground(WHITE);
 		drawStick();
@@ -40,18 +19,32 @@ int main() {
 	return 0;
 }
 
+void getInput() {
+	if (IsKeyPressed(KEY_H)) {
+		punch(LEFTPART);
+	}
+	if (IsKeyPressed(KEY_L)) {
+		punch(RIGHTPART);
+	}
+	if (IsKeyPressed(KEY_W)) {
+		lowerHead();
+	}
+	if (IsKeyReleased(KEY_W)) {
+		upperHead();
+	}
+}
 void initStick() {
+	player.headV = 0.4 * PI;
 	player.neck = (Vector2){ 200,300 };
+	player.elbowLeftV = 1.6 * PI;
+	player.handLeftV = 0.4 * PI;
+	player.elbowRightV = 1.4 * PI;
+	player.handRightV = 0.3 * PI;
 	player.center = (Vector2){ 200, 200 };
-	player.headV = 0.5 * PI;
-	player.elbowLeftV = 1.4 * PI;
-	player.handLeftV = 1.45 * PI;
-	player.elbowRightV = 1.6 * PI;
-	player.handRightV = 1.55 * PI;
 	player.kneeLeftV = 1.4 * PI;
-	player.footLeftV = 1.5 * PI;
+	player.footLeftV = 1.45 * PI;
 	player.kneeRightV = 1.6 * PI;
-	player.footRightV = 1.5 * PI;
+	player.footRightV = 1.55 * PI;
 	player.color = BLACK;
 }
 void drawStick() {
@@ -115,8 +108,95 @@ void drawStick() {
 	DrawCircle((int)footR.x, (int)footR.y, THICKNESS / 2, player.color);
 	Vector2 control;
 	control.x = neck.x;
-	control.y = neck.y + ARMLEN/2;
+	control.y = neck.y + ARMLEN / 2;
 	DrawSplineSegmentBezierQuadratic(center, control, neck, THICKNESS, player.color);
 	DrawCircle(neck.x, neck.y, THICKNESS / 2, player.color);
 	DrawCircle(center.x, center.y, THICKNESS / 2, player.color);
+}
+void detectEdge() {
+	if (player.headV < 0.25 * PI || player.headV > 0.4 * PI) {
+		status.headV = 0;
+	}
+	if (b1) {
+		if (player.elbowLeftV <= 1.4 * PI/* && player.handLeftV < 0.1 * PI*/) {
+			player.elbowLeftV = 1.4 * PI;
+			player.handLeftV = 0.1 * PI;
+			status.elbowLeftV = 0.56 * PI;
+			status.handLeftV = -0.16 * PI;
+			b1 = false;
+			b2 = true;
+			b3 = false;
+		}
+		if (player.elbowRightV <= 1.3 * PI/* && player.handRightV < 0.1 * PI*/) {
+			player.elbowRightV = 1.3 * PI;
+			player.handRightV = 0.1 * PI;
+			status.elbowRightV = 0.66 * PI;
+			status.handRightV = -0.16 * PI;
+			b1 = false;
+			b2 = true;
+			b3 = false;
+		}
+	}
+	if (b2) {
+		if (player.elbowLeftV >= 1.95 * PI) {
+			player.elbowLeftV = 1.95 * PI;
+			player.handLeftV = 1.95 * PI;
+			status.elbowLeftV = -0.36 * PI;
+			status.handLeftV = 0.46 * PI;
+			b1 = false;
+			b2 = false;
+			b3 = true;
+		}
+		if (player.elbowRightV >= 1.95 * PI) {
+			player.elbowRightV = 1.95 * PI;
+			player.handRightV = 1.95 * PI;
+			status.elbowRightV = -0.56 * PI;
+			status.handRightV = 0.36 * PI;
+			b1 = false;
+			b2 = false;
+			b3 = true;
+		}
+	}
+	if (b3) {
+		if (player.elbowLeftV < 1.6 * PI) {
+			player.elbowLeftV = 1.6 * PI;
+			player.handLeftV = 0.4 * PI;
+			status.elbowLeftV = 0;
+			status.handLeftV = 0;
+			b1 = true;
+			b2 = false;
+			b3 = false;
+		}
+		if (player.elbowRightV < 1.4 * PI) {
+			player.elbowRightV = 1.4 * PI;
+			player.handRightV = 0.3 * PI;
+			status.elbowRightV = 0;
+			status.handRightV = 0;
+			b1 = true;
+			b2 = false;
+			b3 = false;
+		}
+	}
+	if (player.handLeftV >= 2 * PI) {
+		player.handLeftV -= 2 * PI;
+	}
+	if (player.handRightV >= 2 * PI) {
+		player.handRightV -= 2 * PI;
+	}
+}
+void calculateStick() {
+	//Step 1: Detect edge conditions
+	detectEdge();
+	//Step 2: Weaken Speed
+	status.headV *= 0.5;
+	status.elbowLeftV *= 0.5;
+	status.handLeftV *= 0.5;
+	status.elbowRightV *= 0.5;
+	status.handRightV *= 0.5;
+	//Step 3: Time past 1 frame
+	player.headV += status.headV;
+	player.elbowLeftV += status.elbowLeftV;
+	player.handLeftV += status.handLeftV;
+	player.elbowRightV += status.elbowRightV;
+	player.handRightV += status.handRightV;
 }
