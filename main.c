@@ -22,6 +22,9 @@ struct STICK {
 } player;
 void initStick();
 void drawStick();
+void detectFalling() {
+	//
+};
 int main() {
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "StickFigure");
 	SetTraceLogLevel(LOG_WARNING);
