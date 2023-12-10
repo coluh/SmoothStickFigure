@@ -1,5 +1,5 @@
 #include "main.h"
-static bool b1 = true, b2 = false, b3 = false;
+struct PERIOD period;
 struct STICK player;
 struct STICK status = { 0 };	//每帧的变化量
 int main() {
@@ -46,6 +46,8 @@ void initStick() {
 	player.kneeRightV = 1.6 * PI;
 	player.footRightV = 1.55 * PI;
 	player.color = BLACK;
+	period.armLeft = STILL;
+	period.armRight = STILL;
 }
 void drawStick() {
 	/* 只在绘图的时候将y坐标反过来, 程序其它部分按正常坐标习惯 */
@@ -112,77 +114,6 @@ void drawStick() {
 	DrawSplineSegmentBezierQuadratic(center, control, neck, THICKNESS, player.color);
 	DrawCircle(neck.x, neck.y, THICKNESS / 2, player.color);
 	DrawCircle(center.x, center.y, THICKNESS / 2, player.color);
-}
-void detectEdge() {
-	if (player.headV < 0.25 * PI || player.headV > 0.4 * PI) {
-		status.headV = 0;
-	}
-	if (b1) {
-		if (player.elbowLeftV <= 1.4 * PI/* && player.handLeftV < 0.1 * PI*/) {
-			player.elbowLeftV = 1.4 * PI;
-			player.handLeftV = 0.1 * PI;
-			status.elbowLeftV = 0.56 * PI;
-			status.handLeftV = -0.16 * PI;
-			b1 = false;
-			b2 = true;
-			b3 = false;
-		}
-		if (player.elbowRightV <= 1.3 * PI/* && player.handRightV < 0.1 * PI*/) {
-			player.elbowRightV = 1.3 * PI;
-			player.handRightV = 0.1 * PI;
-			status.elbowRightV = 0.66 * PI;
-			status.handRightV = -0.16 * PI;
-			b1 = false;
-			b2 = true;
-			b3 = false;
-		}
-	}
-	if (b2) {
-		if (player.elbowLeftV >= 1.95 * PI) {
-			player.elbowLeftV = 1.95 * PI;
-			player.handLeftV = 1.95 * PI;
-			status.elbowLeftV = -0.36 * PI;
-			status.handLeftV = 0.46 * PI;
-			b1 = false;
-			b2 = false;
-			b3 = true;
-		}
-		if (player.elbowRightV >= 1.95 * PI) {
-			player.elbowRightV = 1.95 * PI;
-			player.handRightV = 1.95 * PI;
-			status.elbowRightV = -0.56 * PI;
-			status.handRightV = 0.36 * PI;
-			b1 = false;
-			b2 = false;
-			b3 = true;
-		}
-	}
-	if (b3) {
-		if (player.elbowLeftV < 1.6 * PI) {
-			player.elbowLeftV = 1.6 * PI;
-			player.handLeftV = 0.4 * PI;
-			status.elbowLeftV = 0;
-			status.handLeftV = 0;
-			b1 = true;
-			b2 = false;
-			b3 = false;
-		}
-		if (player.elbowRightV < 1.4 * PI) {
-			player.elbowRightV = 1.4 * PI;
-			player.handRightV = 0.3 * PI;
-			status.elbowRightV = 0;
-			status.handRightV = 0;
-			b1 = true;
-			b2 = false;
-			b3 = false;
-		}
-	}
-	if (player.handLeftV >= 2 * PI) {
-		player.handLeftV -= 2 * PI;
-	}
-	if (player.handRightV >= 2 * PI) {
-		player.handRightV -= 2 * PI;
-	}
 }
 void calculateStick() {
 	//Step 1: Detect edge conditions
