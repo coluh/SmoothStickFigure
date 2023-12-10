@@ -55,11 +55,10 @@ void runningForward() {
 		return;
 	}
 	if (period.legs == RUNNING) {
-		/*player.kneeLeftV += 0.035 * PI;
-		  player.footLeftV += 0.03 * PI;
-		  player.kneeRightV -= 0.03 * PI;
-		  player.footRightV -= 0.05 * PI;*/
-		
+		player.kneeLeftV += 0.035 * PI;
+		player.footLeftV += 0.03 * PI;
+		player.kneeRightV -= 0.03 * PI;
+		player.footRightV -= 0.05 * PI;
 		player.center.x += 9.3;
 		player.center.x += 9.3;
 		player.neck.x += 9.3;
@@ -72,15 +71,14 @@ void runningForward() {
 			player.footLeftV = 1.7 * PI;
 			player.kneeRightV = 1.3 * PI;
 			player.footRightV = 1.05 * PI;
-			status.kneeLeftV = -0.21 * PI;
-			status.footLeftV = -0.151 * PI;
-			status.kneeRightV = 0.151 * PI;
-			status.footRightV = 0.351 * PI;
 			period.legs = FLYING;
 		}
 	}
 	else {
-		
+		player.kneeLeftV -= 0.02 * PI;
+		player.footLeftV -= 0.015 * PI;
+		player.kneeRightV += 0.015 * PI;
+		player.footRightV += 0.035 * PI;
 		player.center.x += 9.3;
 		player.center.x += 9.3;
 		player.neck.x += 9.3;
@@ -93,16 +91,8 @@ void runningForward() {
 			player.footLeftV = 1.4 * PI;
 			player.kneeRightV = 1.6 * PI;
 			player.footRightV = 1.55 * PI;
-			status.kneeLeftV = 0;
-			status.footLeftV = 0;
-			status.kneeRightV = 0;
-			status.footRightV = 0;
 			if (period.legs == FLYING) {
 				period.legs = RUNNING;
-				status.kneeLeftV = 0.351 * PI;
-				status.footLeftV = 0.31 * PI;
-				status.kneeRightV = -0.31 * PI;
-				status.footRightV = -0.51 * PI;
 			}
 			else {
 				player.neck.x -= 20;

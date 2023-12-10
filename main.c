@@ -49,14 +49,10 @@ void getInput(double* lastClickTime) {
 			walking(BACKWARD);
 		}
 	}
-	if (IsKeyPressed(KEY_D)) {
+	if(IsKeyPressed(KEY_D)) {
 		double currentTime = GetTime();
 		if (currentTime - *lastClickTime <= 0.4) {
 			period.legs = RUNNING;
-			status.kneeLeftV = 0.351 * PI;
-			status.footLeftV = 0.31 * PI;
-			status.kneeRightV = -0.31 * PI;
-			status.footRightV = -0.51 * PI;
 			player.neck.x += 20;
 			player.neck.y -= 10;
 			*lastClickTime = 0;
@@ -168,18 +164,10 @@ void calculateStick() {
 	status.handLeftV *= 0.5;
 	status.elbowRightV *= 0.5;
 	status.handRightV *= 0.5;
-	status.kneeLeftV *= 0.5;
-	status.footLeftV *= 0.5;
-	status.kneeRightV *= 0.5;
-	status.footRightV *= 0.5;
 	//Step 3: Time past 1 frame
 	player.headV += status.headV;
 	player.elbowLeftV += status.elbowLeftV;
 	player.handLeftV += status.handLeftV;
 	player.elbowRightV += status.elbowRightV;
 	player.handRightV += status.handRightV;
-	player.kneeLeftV += status.kneeLeftV;
-	player.footLeftV += status.footLeftV;
-	player.kneeRightV += status.kneeRightV;
-	player.footRightV += status.footRightV;
 }
