@@ -1,5 +1,5 @@
 #include "main.h"
-struct PERIOD period;
+struct PERIOD period = { 0 };
 struct STICK player;
 struct STICK status = { 0 };	//每帧的变化量
 int main() {
@@ -7,19 +7,22 @@ int main() {
 	SetTraceLogLevel(LOG_WARNING);
 	SetTargetFPS(60);
 	initStick();
+	double lastClickTime = 0;
 	while (!WindowShouldClose()) {
-		getInput();
+		getInput(&lastClickTime);
 		calculateStick();
 		BeginDrawing();
 		ClearBackground(WHITE);
 		drawStick();
+		//Ground
+		DrawLine(0, SCREENHEIGHT - GROUNDHEIGHT, SCREENWIDTH, SCREENHEIGHT - GROUNDHEIGHT, RED);
 		EndDrawing();
 	}
 	CloseWindow();
 	return 0;
 }
 
-void getInput() {
+void getInput(double* lastClickTime) {
 	if (IsKeyPressed(KEY_H)) {
 		punch(LEFTPART);
 	}
@@ -32,22 +35,45 @@ void getInput() {
 	if (IsKeyReleased(KEY_W)) {
 		upperHead();
 	}
+	if (IsKeyDown(KEY_D)) {
+		walking(FORWARD);
+		runningForward();
+	}
+	else {
+		if (IsKeyDown(KEY_A)) {
+			walking(BACKWARD);
+		}
+	}
+	if(IsKeyPressed(KEY_D)) {
+		double currentTime = GetTime();
+		if (currentTime - *lastClickTime <= 0.4) {
+			period.legs = RUNNING;
+			*lastClickTime = 0;
+		}
+		else {
+			*lastClickTime = currentTime;
+		}
+	}
+	if (period.legs == RUNNING && IsKeyReleased(KEY_D)) {
+		period.legs = STILL;
+	}
 }
 void initStick() {
 	player.headV = 0.4 * PI;
-	player.neck = (Vector2){ 200,300 };
+	player.neck = (Vector2){ 210,350 };
 	player.elbowLeftV = 1.6 * PI;
 	player.handLeftV = 0.4 * PI;
 	player.elbowRightV = 1.4 * PI;
 	player.handRightV = 0.3 * PI;
-	player.center = (Vector2){ 200, 200 };
-	player.kneeLeftV = 1.4 * PI;
-	player.footLeftV = 1.45 * PI;
+	player.center = (Vector2){ 200, 250 };
+	player.kneeLeftV = 1.45 * PI;
+	player.footLeftV = 1.4 * PI;
 	player.kneeRightV = 1.6 * PI;
 	player.footRightV = 1.55 * PI;
 	player.color = BLACK;
-	period.armLeft = STILL;
-	period.armRight = STILL;
+	touchGround();
+	/*period.armLeft = STILL;
+	period.armRight = STILL;*/
 }
 void drawStick() {
 	/* 只在绘图的时候将y坐标反过来, 程序其它部分按正常坐标习惯 */

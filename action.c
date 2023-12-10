@@ -50,6 +50,44 @@ void punch(bool part) {
 		break;
 	}
 }
+void runningForward() {
+	if (period.legs != RUNNING) {
+		return;
+	}
+	printf("\nRunning...");
+}
+void walking(enum DIRECTION direction) {
+	switch (period.legs) {
+	case MOVE:
+		player.kneeLeftV += 0.005 * PI;
+		player.footLeftV += 0.005 * PI;
+		player.kneeRightV -= 0.005 * PI;
+		player.footRightV -= 0.005 * PI;
+		if (direction == FORWARD) {
+			player.center.x += 3.103f;
+			player.neck.x += 3.103f;
+			if (player.kneeLeftV > 1.6 * PI) {
+				period.legs = END;
+			}
+		}
+		else {
+			player.center.x -= 3.103f;
+			player.neck.x -= 3.103f;
+			if (player.kneeRightV < 1.45 * PI) {
+				period.legs = END;
+			}
+		}
+		touchGround();
+		break;
+	case END:
+		player.kneeLeftV = 1.45 * PI;
+		player.footLeftV = 1.4 * PI;
+		player.kneeRightV = 1.6 * PI;
+		player.footRightV = 1.55 * PI;
+		period.legs = MOVE;
+		break;
+	}
+}
 void detectEdge() {
 	if (player.headV < 0.25 * PI || player.headV > 0.4 * PI) {
 		status.headV = 0;
@@ -125,4 +163,10 @@ void detectEdge() {
 		player.handRightV -= 2 * PI;
 	}
 	//printf("\n \x1B[1;37;41mUndefined Motion \x1B[m");
+}
+void touchGround() {
+	//以右脚为基准
+	double offsetY = player.center.y + LEGLEN * sin(player.kneeRightV) + LEGLEN * sin(player.footRightV) - GROUNDHEIGHT - THICKNESS / 2;
+	player.center.y -= offsetY;
+	player.neck.y -= offsetY;
 }

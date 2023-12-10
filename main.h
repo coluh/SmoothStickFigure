@@ -10,19 +10,20 @@
 #define THICKNESS 12		//maybe 20 is like Alan's
 #define SCREENWIDTH 2100
 #define SCREENHEIGHT 900
-//enum PERIOD {
-//	STILL,
-//	PUNCH_LEFT_PULL, PUNCH_LEFT_HIT, PUNCH_LEFT_BACK,
-//	PUNCH_RIGHT_PULL, PUNCH_RIGHT_HIT, PUNCH_RIGHT_BACK,
-//
-//};
+#define GROUNDHEIGHT 40
+enum DIRECTION {
+	BACKWARD, FORWARD
+};
 enum PERIOD_PUNCH {
 	STILL, PUNCH_PULL, PUNCH_HIT, PUNCH_BACK
+};
+enum PERIOD_WALK {
+	MOVE, END, RUNNING
 };
 struct PERIOD {
 	enum PERIOD_PUNCH armLeft;
 	enum PERIOD_PUNCH armRight;
-	//
+	enum PERIOD_WALK legs;
 };
 struct STICK {
 	double headV;			/*    (_)  80	*/
@@ -41,7 +42,10 @@ struct STICK {
 void initStick();
 void drawStick();
 void calculateStick();
-void getInput();
+void getInput(double*);
 void punch(bool);
 void lowerHead();
 void upperHead();
+void walking(enum DIRECTION);
+void runningForward();
+void touchGround();
