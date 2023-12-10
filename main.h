@@ -15,15 +15,21 @@ enum DIRECTION {
 	BACKWARD, FORWARD
 };
 enum PERIOD_PUNCH {
-	STILL, PUNCH_PULL, PUNCH_HIT, PUNCH_BACK
+	PUNCH_STILL, PUNCH_PULL, PUNCH_HIT, PUNCH_BACK
 };
 enum PERIOD_WALK {
 	MOVE, END, RUNNING, FLYING, FALLING
 };
+enum PERIOD_SQUAT {
+	STANDING, SQUATDOWN, SQUATING
+};
 struct PERIOD {
 	enum PERIOD_PUNCH armLeft;
 	enum PERIOD_PUNCH armRight;
+	enum PERIOD_PUNCH leftCut;
+	enum PERIOD_PUNCH rightCut;
 	enum PERIOD_WALK legs;
+	enum PERIOD_SQUAT body;
 };
 struct STICK {
 	double headV;			/*    (_)  80	*/
@@ -44,8 +50,12 @@ void drawStick();
 void calculateStick();
 void getInput(double*);
 void punch(bool);
+void handKnife();
+void upperCut();
 void lowerHead();
 void upperHead();
+void squating();
+void standing();
 void walking(enum DIRECTION);
 void runningForward();
 void touchGround(bool);

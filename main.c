@@ -16,6 +16,7 @@ int main() {
 		drawStick();
 		//Ground
 		DrawLine(0, SCREENHEIGHT - GROUNDHEIGHT, SCREENWIDTH, SCREENHEIGHT - GROUNDHEIGHT, RED);
+		DrawText(TextFormat("%d", GetFPS()), 50, 20, 50, RED);
 		EndDrawing();
 	}
 	CloseWindow();
@@ -26,11 +27,11 @@ void getInput(double* lastClickTime) {
 	if (IsKeyPressed(KEY_H)) {
 		punch(LEFTPART);
 	}
-	if (IsKeyPressed(KEY_J)) {
-		//Åü
+	if (IsKeyPressed(KEY_J) && period.leftCut == PUNCH_STILL && (period.armLeft == PUNCH_STILL && (period.armRight == PUNCH_STILL || period.armRight == PUNCH_BACK))) {
+		handKnife();
 	}
-	if (IsKeyPressed(KEY_K)) {
-		//ÉÏ¹´È­
+	if (IsKeyPressed(KEY_K) && period.leftCut == PUNCH_STILL && (period.armRight == PUNCH_STILL && (period.armLeft == PUNCH_STILL || period.armLeft == PUNCH_BACK))) {
+		upperCut();
 	}
 	if (IsKeyPressed(KEY_L)) {
 		punch(RIGHTPART);
@@ -47,9 +48,10 @@ void getInput(double* lastClickTime) {
 	else {
 		if (IsKeyDown(KEY_A)) {
 			walking(BACKWARD);
+			walking(BACKWARD);
 		}
 	}
-	if(IsKeyPressed(KEY_D)) {
+	if (IsKeyPressed(KEY_D)) {
 		double currentTime = GetTime();
 		if (currentTime - *lastClickTime <= 0.4) {
 			period.legs = RUNNING;
@@ -69,6 +71,14 @@ void getInput(double* lastClickTime) {
 		}
 		if (period.legs == FLYING) {
 			period.legs = FALLING;
+		}
+	}
+	if (IsKeyUp(KEY_A) && IsKeyUp(KEY_D)) {
+		if (IsKeyDown(KEY_LEFT_SHIFT)) {
+			squating();
+		}
+		if (IsKeyUp(KEY_LEFT_SHIFT)) {
+			standing();
 		}
 	}
 }
@@ -159,11 +169,11 @@ void calculateStick() {
 	//Step 1: Detect edge conditions
 	detectEdge();
 	//Step 2: Weaken Speed
-	status.headV *= 0.5;
-	status.elbowLeftV *= 0.5;
-	status.handLeftV *= 0.5;
-	status.elbowRightV *= 0.5;
-	status.handRightV *= 0.5;
+	status.headV *= 0.9;
+	status.elbowLeftV *= 0.9;
+	status.handLeftV *= 0.9;
+	status.elbowRightV *= 0.9;
+	status.handRightV *= 0.9;
 	//Step 3: Time past 1 frame
 	player.headV += status.headV;
 	player.elbowLeftV += status.elbowLeftV;

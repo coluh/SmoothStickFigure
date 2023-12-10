@@ -14,13 +14,13 @@ extern struct STICK status;
 * space
 */
 void lowerHead() {
-	status.headV = -0.15 * PI;
+	status.headV = -0.15 * PI / 4;
 	if (player.headV >= 0.4 * PI) {
 		player.headV = 0.4 * PI;
 	}
 }
 void upperHead() {
-	status.headV = 0.15 * PI;
+	status.headV = 0.15 * PI / 4;
 	if (player.headV <= 0.25 * PI) {
 		player.headV = 0.25 * PI;
 	}
@@ -36,19 +36,29 @@ void punch(bool part) {
 		if (period.armLeft == PUNCH_HIT || period.armLeft == PUNCH_BACK) {
 			break;
 		}
-		status.elbowLeftV = -0.21 * PI;
-		status.handLeftV = -0.31 * PI;
+		if (period.leftCut != PUNCH_STILL) {
+			break;
+		}
+		status.elbowLeftV = -0.2 * PI / 3;
+		status.handLeftV = -0.3 * PI / 3;
 		period.armLeft = PUNCH_PULL;
 		break;
 	case RIGHTPART:
 		if (period.armRight == PUNCH_HIT || period.armRight == PUNCH_BACK) {
 			break;
 		}
-		status.elbowRightV = -0.11 * PI;
-		status.handRightV = -0.21 * PI;
+		status.elbowRightV = -0.1 * PI / 3;
+		status.handRightV = -0.2 * PI / 3;
 		period.armRight = PUNCH_PULL;
 		break;
 	}
+}
+void handKnife() {
+	status.elbowLeftV = 0.8 * PI / 6;
+	period.leftCut = PUNCH_PULL;
+}
+void upperCut() {
+	//
 }
 void runningForward() {
 	if (period.legs == MOVE || period.legs == END) {
@@ -59,10 +69,10 @@ void runningForward() {
 		player.footLeftV += 0.03 * PI;
 		player.kneeRightV -= 0.03 * PI;
 		player.footRightV -= 0.05 * PI;
-		player.center.x += 9.3;
-		player.center.x += 9.3;
-		player.neck.x += 9.3;
-		player.neck.x += 9.3;
+		player.center.x += 9.3f;
+		player.center.x += 9.3f;
+		player.neck.x += 9.3f;
+		player.neck.x += 9.3f;
 		/*if (onGround(RIGHTPART)) {
 			touchGround(RIGHTPART);
 		}*/
@@ -79,10 +89,10 @@ void runningForward() {
 		player.footLeftV -= 0.015 * PI;
 		player.kneeRightV += 0.015 * PI;
 		player.footRightV += 0.035 * PI;
-		player.center.x += 9.3;
-		player.center.x += 9.3;
-		player.neck.x += 9.3;
-		player.neck.x += 9.3;
+		player.center.x += 9.3f;
+		player.center.x += 9.3f;
+		player.neck.x += 9.3f;
+		player.neck.x += 9.3f;
 		/*if (onGround(LEFTPART)) {
 			touchGround(LEFTPART);
 		}*/
@@ -139,17 +149,29 @@ void detectEdge() {
 	if (player.headV < 0.25 * PI || player.headV > 0.4 * PI) {
 		status.headV = 0;
 	}
+	if (player.elbowLeftV >= 2 * PI) {
+		player.elbowLeftV -= 2 * PI;
+	}
+	if (player.elbowRightV >= 2 * PI) {
+		player.elbowRightV -= 2 * PI;
+	}
+	if (player.handLeftV >= 2 * PI) {
+		player.handLeftV -= 2 * PI;
+	}
+	if (player.handRightV >= 2 * PI) {
+		player.handRightV -= 2 * PI;
+	}
 	runningForward();
 	switch (period.armLeft) {
-	case STILL:
+	case PUNCH_STILL:
 		//do nothing
 		break;
 	case PUNCH_PULL:
 		if (player.elbowLeftV <= 1.4 * PI/* && player.handLeftV < 0.1 * PI*/) {
 			player.elbowLeftV = 1.4 * PI;
 			player.handLeftV = 0.1 * PI;
-			status.elbowLeftV = 0.56 * PI;
-			status.handLeftV = -0.16 * PI;
+			status.elbowLeftV = 0.55 * PI / 3;
+			status.handLeftV = -0.15 * PI / 3;
 			period.armLeft = PUNCH_HIT;
 		}
 		break;
@@ -157,8 +179,8 @@ void detectEdge() {
 		if (player.elbowLeftV >= 1.95 * PI) {
 			player.elbowLeftV = 1.95 * PI;
 			player.handLeftV = 1.95 * PI;
-			status.elbowLeftV = -0.36 * PI;
-			status.handLeftV = 0.46 * PI;
+			status.elbowLeftV = -0.35 * PI / 3;
+			status.handLeftV = 0.45 * PI / 3;
 			period.armLeft = PUNCH_BACK;
 		}
 		break;
@@ -168,20 +190,20 @@ void detectEdge() {
 			player.handLeftV = 0.4 * PI;
 			status.elbowLeftV = 0;
 			status.handLeftV = 0;
-			period.armLeft = STILL;
+			period.armLeft = PUNCH_STILL;
 		}
 		break;
 	}
 	switch (period.armRight) {
-	case STILL:
+	case PUNCH_STILL:
 		//do nothing
 		break;
 	case PUNCH_PULL:
 		if (player.elbowRightV <= 1.3 * PI/* && player.handRightV < 0.1 * PI*/) {
 			player.elbowRightV = 1.3 * PI;
 			player.handRightV = 0.1 * PI;
-			status.elbowRightV = 0.66 * PI;
-			status.handRightV = -0.16 * PI;
+			status.elbowRightV = 0.65 * PI / 3;
+			status.handRightV = -0.15 * PI / 3;
 			period.armRight = PUNCH_HIT;
 		}
 		break;
@@ -189,8 +211,8 @@ void detectEdge() {
 		if (player.elbowRightV >= 1.95 * PI) {
 			player.elbowRightV = 1.95 * PI;
 			player.handRightV = 1.95 * PI;
-			status.elbowRightV = -0.56 * PI;
-			status.handRightV = 0.36 * PI;
+			status.elbowRightV = -0.55 * PI / 3;
+			status.handRightV = 0.35 * PI / 3;
 			period.armRight = PUNCH_BACK;
 		}
 		break;
@@ -200,15 +222,37 @@ void detectEdge() {
 			player.handRightV = 0.3 * PI;
 			status.elbowRightV = 0;
 			status.handRightV = 0;
-			period.armRight = STILL;
+			period.armRight = PUNCH_STILL;
 		}
 		break;
 	}
-	if (player.handLeftV >= 2 * PI) {
-		player.handLeftV -= 2 * PI;
-	}
-	if (player.handRightV >= 2 * PI) {
-		player.handRightV -= 2 * PI;
+	switch (period.leftCut) {
+	case PUNCH_PULL:
+		if (player.elbowLeftV > 0.4 * PI && player.elbowLeftV < 0.5 * PI) {
+			player.elbowLeftV = 0.4 * PI;
+			player.handLeftV = 0.4 * PI;
+			period.leftCut = PUNCH_HIT;
+			status.elbowLeftV = -0.4 * PI / 3;
+			status.handLeftV = -0.4 * PI / 3;
+		}
+		break;
+	case PUNCH_HIT:
+		if (player.elbowLeftV < 0 && player.handLeftV < 0) {
+			player.elbowLeftV = 1.99 * PI;
+			player.handLeftV = 0;
+			period.leftCut = PUNCH_BACK;
+			status.elbowLeftV = -0.4 * PI / 8;
+			status.handLeftV = 0.4 * PI / 8;
+		}
+		break;
+	case PUNCH_BACK:
+		if (player.elbowLeftV < 1.6 * PI && player.handLeftV > 0.4 * PI) {
+			player.elbowLeftV = 1.6 * PI;
+			player.handLeftV = 0.4 * PI;
+			period.leftCut = PUNCH_STILL;
+			status.elbowLeftV = 0;
+			status.handLeftV = 0;
+		}
 	}
 	//printf("\n \x1B[1;37;41mUndefined Motion \x1B[m");
 }
@@ -233,5 +277,56 @@ bool onGround(bool part) {
 	}
 	if (offsetY <= 1 && offsetY >= -1) {
 		return true;
+	}
+	return false;
+}
+void squating() {
+	switch (period.body) {
+	case STANDING:
+		period.body = SQUATDOWN;
+		break;
+	case SQUATDOWN:
+		player.neck.x += 1;
+		player.neck.y -= 1;
+		player.kneeLeftV += 0.02 * PI;
+		player.footLeftV -= 0.013 * PI;
+		player.kneeRightV += 0.021 * PI;
+		player.footRightV -= 0.005 * PI;
+		if (player.kneeLeftV > 1.85 * PI) {
+			player.kneeLeftV = 1.85 * PI;
+			player.footLeftV = 1.14 * PI;
+			player.kneeRightV = 0.02 * PI;
+			player.footRightV = 1.45 * PI;
+			player.neck.x = player.center.x + 30;
+			player.neck.y = player.center.y + 80;
+			period.body = SQUATING;
+		}
+		touchGround(RIGHTPART);
+		break;
+	}
+}
+void standing() {
+	switch (period.body) {
+	case SQUATING:
+		period.body = SQUATDOWN;
+		break;
+	case SQUATDOWN:
+		player.neck.x -= 1;
+		player.neck.y += 1;
+		player.kneeLeftV -= 0.02 * PI;
+		player.footLeftV += 0.013 * PI;
+		player.kneeRightV -= 0.021 * PI;
+		player.footRightV += 0.005 * PI;
+		if (player.kneeLeftV <= 1.45 * PI) {
+			player.kneeLeftV = 1.45 * PI;
+			player.footLeftV = 1.4 * PI;
+			player.kneeRightV = 1.6 * PI;
+			player.footRightV = 1.55 * PI;
+			period.body = STANDING;
+			player.neck.x = player.center.x + 10;
+			player.neck.y = player.center.y + 100;
+		}
+		touchGround(RIGHTPART);
+		break;
 	}
 }
