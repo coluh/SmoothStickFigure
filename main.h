@@ -18,7 +18,7 @@ enum PERIOD_PUNCH {
 	STILL, PUNCH_PULL, PUNCH_HIT, PUNCH_BACK
 };
 enum PERIOD_WALK {
-	MOVE, END, RUNNING
+	MOVE, END, RUNNING, FLYING, FALLING
 };
 struct PERIOD {
 	enum PERIOD_PUNCH armLeft;
@@ -48,4 +48,5 @@ void lowerHead();
 void upperHead();
 void walking(enum DIRECTION);
 void runningForward();
-void touchGround();
+void touchGround(bool);
+bool onGround(bool);

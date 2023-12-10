@@ -51,10 +51,57 @@ void punch(bool part) {
 	}
 }
 void runningForward() {
-	if (period.legs != RUNNING) {
+	if (period.legs == MOVE || period.legs == END) {
 		return;
 	}
-	printf("\nRunning...");
+	if (period.legs == RUNNING) {
+		player.kneeLeftV += 0.035 * PI;
+		player.footLeftV += 0.03 * PI;
+		player.kneeRightV -= 0.03 * PI;
+		player.footRightV -= 0.05 * PI;
+		player.center.x += 9.3;
+		player.center.x += 9.3;
+		player.neck.x += 9.3;
+		player.neck.x += 9.3;
+		/*if (onGround(RIGHTPART)) {
+			touchGround(RIGHTPART);
+		}*/
+		if (player.kneeLeftV > 1.8 * PI) {
+			player.kneeLeftV = 1.8 * PI;
+			player.footLeftV = 1.7 * PI;
+			player.kneeRightV = 1.3 * PI;
+			player.footRightV = 1.05 * PI;
+			period.legs = FLYING;
+		}
+	}
+	else {
+		player.kneeLeftV -= 0.02 * PI;
+		player.footLeftV -= 0.015 * PI;
+		player.kneeRightV += 0.015 * PI;
+		player.footRightV += 0.035 * PI;
+		player.center.x += 9.3;
+		player.center.x += 9.3;
+		player.neck.x += 9.3;
+		player.neck.x += 9.3;
+		/*if (onGround(LEFTPART)) {
+			touchGround(LEFTPART);
+		}*/
+		if (player.kneeLeftV < 1.6 * PI) {
+			player.kneeLeftV = 1.45 * PI;
+			player.footLeftV = 1.4 * PI;
+			player.kneeRightV = 1.6 * PI;
+			player.footRightV = 1.55 * PI;
+			if (period.legs == FLYING) {
+				period.legs = RUNNING;
+			}
+			else {
+				player.neck.x -= 20;
+				player.neck.y += 10;
+				period.legs = MOVE;
+			}
+		}
+
+	}
 }
 void walking(enum DIRECTION direction) {
 	switch (period.legs) {
@@ -73,11 +120,11 @@ void walking(enum DIRECTION direction) {
 		else {
 			player.center.x -= 3.103f;
 			player.neck.x -= 3.103f;
-			if (player.kneeRightV < 1.45 * PI) {
+			if (player.kneeLeftV > 1.6 * PI) {
 				period.legs = END;
 			}
 		}
-		touchGround();
+		touchGround(RIGHTPART);
 		break;
 	case END:
 		player.kneeLeftV = 1.45 * PI;
@@ -92,6 +139,7 @@ void detectEdge() {
 	if (player.headV < 0.25 * PI || player.headV > 0.4 * PI) {
 		status.headV = 0;
 	}
+	runningForward();
 	switch (period.armLeft) {
 	case STILL:
 		//do nothing
@@ -164,9 +212,26 @@ void detectEdge() {
 	}
 	//printf("\n \x1B[1;37;41mUndefined Motion \x1B[m");
 }
-void touchGround() {
-	//以右脚为基准
-	double offsetY = player.center.y + LEGLEN * sin(player.kneeRightV) + LEGLEN * sin(player.footRightV) - GROUNDHEIGHT - THICKNESS / 2;
+void touchGround(bool part) {
+	double offsetY = player.center.y - GROUNDHEIGHT - THICKNESS / 2;
+	if (part == RIGHTPART) {
+		offsetY += LEGLEN * sin(player.kneeRightV) + LEGLEN * sin(player.footRightV);
+	}
+	else {
+		offsetY += LEGLEN * sin(player.kneeLeftV) + LEGLEN * sin(player.footLeftV);
+	}
 	player.center.y -= offsetY;
 	player.neck.y -= offsetY;
+}
+bool onGround(bool part) {
+	double offsetY = player.center.y - GROUNDHEIGHT - THICKNESS / 2;
+	if (part == RIGHTPART) {
+		offsetY += LEGLEN * sin(player.kneeRightV) + LEGLEN * sin(player.footRightV);
+	}
+	else {
+		offsetY += LEGLEN * sin(player.kneeLeftV) + LEGLEN * sin(player.footLeftV);
+	}
+	if (offsetY <= 1 && offsetY >= -1) {
+		return true;
+	}
 }

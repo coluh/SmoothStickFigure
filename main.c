@@ -26,6 +26,12 @@ void getInput(double* lastClickTime) {
 	if (IsKeyPressed(KEY_H)) {
 		punch(LEFTPART);
 	}
+	if (IsKeyPressed(KEY_J)) {
+		//Åü
+	}
+	if (IsKeyPressed(KEY_K)) {
+		//ÉÏ¹´È­
+	}
 	if (IsKeyPressed(KEY_L)) {
 		punch(RIGHTPART);
 	}
@@ -37,7 +43,6 @@ void getInput(double* lastClickTime) {
 	}
 	if (IsKeyDown(KEY_D)) {
 		walking(FORWARD);
-		runningForward();
 	}
 	else {
 		if (IsKeyDown(KEY_A)) {
@@ -48,14 +53,23 @@ void getInput(double* lastClickTime) {
 		double currentTime = GetTime();
 		if (currentTime - *lastClickTime <= 0.4) {
 			period.legs = RUNNING;
+			player.neck.x += 20;
+			player.neck.y -= 10;
 			*lastClickTime = 0;
 		}
 		else {
 			*lastClickTime = currentTime;
 		}
 	}
-	if (period.legs == RUNNING && IsKeyReleased(KEY_D)) {
-		period.legs = STILL;
+	if (IsKeyReleased(KEY_D)) {
+		if (period.legs == RUNNING) {
+			period.legs = MOVE;
+			player.neck.x -= 20;
+			player.neck.y += 10;
+		}
+		if (period.legs == FLYING) {
+			period.legs = FALLING;
+		}
 	}
 }
 void initStick() {
@@ -71,7 +85,7 @@ void initStick() {
 	player.kneeRightV = 1.6 * PI;
 	player.footRightV = 1.55 * PI;
 	player.color = BLACK;
-	touchGround();
+	touchGround(RIGHTPART);
 	/*period.armLeft = STILL;
 	period.armRight = STILL;*/
 }
