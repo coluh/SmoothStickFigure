@@ -3,14 +3,15 @@
 #include <stdbool.h>
 #include <raylib.h>
 #include <raymath.h>
-#define LEFTPART false
-#define RIGHTPART true
 #define ARMLEN 80
 #define LEGLEN 100
 #define THICKNESS 12		//maybe 20 is like Alan's
 #define SCREENWIDTH 2100
 #define SCREENHEIGHT 900
 #define GROUNDHEIGHT 40
+enum BODYPART {
+	LEFTPART, RIGHTPART
+};
 enum DIRECTION {
 	BACKWARD, FORWARD
 };
@@ -23,6 +24,9 @@ enum PERIOD_WALK {
 enum PERIOD_SQUAT {
 	STANDING, SQUATDOWN, SQUATING
 };
+enum PERIOD_JUMP {
+	NOTJUMP, ACCUMULATE, JUMPING
+};
 struct PERIOD {
 	enum PERIOD_PUNCH armLeft;
 	enum PERIOD_PUNCH armRight;
@@ -30,6 +34,7 @@ struct PERIOD {
 	enum PERIOD_PUNCH rightCut;
 	enum PERIOD_WALK legs;
 	enum PERIOD_SQUAT body;
+	enum PERIOD_JUMP bodyj;
 };
 struct STICK {
 	double headV;			/*    (_)  80	*/
@@ -49,7 +54,7 @@ void initStick();
 void drawStick();
 void calculateStick();
 void getInput(double*);
-void punch(bool);
+void punch(enum BODYPART);
 void handKnife();
 void upperCut();
 void lowerHead();
@@ -58,5 +63,6 @@ void squating();
 void standing();
 void walking(enum DIRECTION);
 void runningForward();
-void touchGround(bool);
-bool onGround(bool);
+void jumping();
+void touchGround(enum BODYPART);
+bool onGround(enum BODYPART, int);

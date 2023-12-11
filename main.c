@@ -30,7 +30,7 @@ void getInput(double* lastClickTime) {
 	if (IsKeyPressed(KEY_J) && period.leftCut == PUNCH_STILL && (period.armLeft == PUNCH_STILL && (period.armRight == PUNCH_STILL || period.armRight == PUNCH_BACK))) {
 		handKnife();
 	}
-	if (IsKeyPressed(KEY_K) && period.leftCut == PUNCH_STILL && (period.armRight == PUNCH_STILL && (period.armLeft == PUNCH_STILL || period.armLeft == PUNCH_BACK))) {
+	if (IsKeyPressed(KEY_K) && period.rightCut == PUNCH_STILL && (period.armRight == PUNCH_STILL && (period.armLeft == PUNCH_STILL || period.armLeft == PUNCH_BACK))) {
 		upperCut();
 	}
 	if (IsKeyPressed(KEY_L)) {
@@ -41,6 +41,13 @@ void getInput(double* lastClickTime) {
 	}
 	if (IsKeyReleased(KEY_W)) {
 		upperHead();
+	}
+	if (IsKeyPressed(KEY_Q)) {
+		player.center.x -= 500;
+		player.neck.x -= 500;
+	}
+	if (IsKeyPressed(KEY_R)) {
+		initStick();
 	}
 	if (IsKeyDown(KEY_D)) {
 		walking(FORWARD);
@@ -80,6 +87,9 @@ void getInput(double* lastClickTime) {
 		if (IsKeyUp(KEY_LEFT_SHIFT)) {
 			standing();
 		}
+	}
+	if (IsKeyPressed(KEY_SPACE) && period.bodyj == NOTJUMP) {
+		period.bodyj = ACCUMULATE;
 	}
 }
 void initStick() {
@@ -180,4 +190,6 @@ void calculateStick() {
 	player.handLeftV += status.handLeftV;
 	player.elbowRightV += status.elbowRightV;
 	player.handRightV += status.handRightV;
+	player.center.y += status.center.y;
+	player.neck.y += status.neck.y;
 }

@@ -25,7 +25,7 @@ void upperHead() {
 		player.headV = 0.25 * PI;
 	}
 }
-void punch(bool part) {
+void punch(enum BODYPART part) {
 	//part: LEFTPART or RIGHTPART
 	//printf("\n%lf\n%lf\n%lf\n%lf\n", player.elbowLeftV, player.handLeftV, player.elbowRightV, player.handRightV);
 	if (period.armLeft == PUNCH_PULL || period.armRight == PUNCH_PULL) {
@@ -54,11 +54,13 @@ void punch(bool part) {
 	}
 }
 void handKnife() {
-	status.elbowLeftV = 0.8 * PI / 6;
+	status.elbowLeftV = 0.8 * PI / 4;
 	period.leftCut = PUNCH_PULL;
 }
 void upperCut() {
-	//
+	status.elbowRightV = -0.3 * PI / 4;
+	status.handRightV = -0.5 * PI / 4;
+	period.rightCut = PUNCH_PULL;
 }
 void runningForward() {
 	if (period.legs == MOVE || period.legs == END) {
@@ -134,7 +136,9 @@ void walking(enum DIRECTION direction) {
 				period.legs = END;
 			}
 		}
-		touchGround(RIGHTPART);
+		if(period.bodyj!=ACCUMULATE){
+			touchGround(RIGHTPART);
+		}
 		break;
 	case END:
 		player.kneeLeftV = 1.45 * PI;
@@ -162,6 +166,7 @@ void detectEdge() {
 		player.handRightV -= 2 * PI;
 	}
 	runningForward();
+	jumping();
 	switch (period.armLeft) {
 	case PUNCH_STILL:
 		//do nothing
@@ -253,10 +258,58 @@ void detectEdge() {
 			status.elbowLeftV = 0;
 			status.handLeftV = 0;
 		}
+		break;
+	}
+	switch (period.rightCut) {
+	case PUNCH_PULL:
+		if (player.handRightV < 0) {
+			player.handRightV += 2 * PI;
+		}
+		if (player.elbowRightV < 1.1 * PI && player.handRightV < 1.8 * PI) {
+			player.elbowRightV = 1.1 * PI;
+			player.handRightV = 1.8 * PI;
+			period.rightCut = PUNCH_HIT;
+			status.elbowRightV = 1.0 * PI / 3;
+			status.handRightV = 0.7 * PI / 3;
+		}
+		break;
+	case PUNCH_HIT:
+		if (player.elbowRightV > 0.1 * PI && player.handRightV > 0.5 * PI) {
+			player.elbowRightV = 0.1 * PI;
+			player.handRightV = 0.5 * PI;
+			period.rightCut = PUNCH_BACK;
+			status.elbowRightV = -0.7 * PI/6;
+			status.handRightV = -0.2 * PI/6;
+		}
+		break;
+	case PUNCH_BACK:
+		if (player.elbowRightV < 0) {
+			player.elbowRightV += 2 * PI;
+		}
+		if (player.elbowRightV < 1.4 * PI && player.handRightV < 0.3 * PI) {
+			player.elbowRightV = 1.4 * PI;
+			player.handRightV = 0.3 * PI;
+			period.rightCut = PUNCH_STILL;
+			status.elbowRightV = 0;
+			status.handRightV = 0;
+		}
+		break;
 	}
 	//printf("\n \x1B[1;37;41mUndefined Motion \x1B[m");
+	if (player.neck.y < 100) {
+		player.neck.y += SCREENHEIGHT * 1.5;
+		player.center.y += SCREENHEIGHT * 1.5;
+	}
+	if (player.center.x > SCREENWIDTH + 200) {
+		player.center.x -= SCREENWIDTH + 400;
+		player.neck.x -= SCREENWIDTH + 400;
+	}
+	if (player.center.x < -200) {
+		player.center.x += SCREENWIDTH + 400;
+		player.neck.x += SCREENWIDTH + 400;
+	}
 }
-void touchGround(bool part) {
+void touchGround(enum BODYPART part) {
 	double offsetY = player.center.y - GROUNDHEIGHT - THICKNESS / 2;
 	if (part == RIGHTPART) {
 		offsetY += LEGLEN * sin(player.kneeRightV) + LEGLEN * sin(player.footRightV);
@@ -264,10 +317,12 @@ void touchGround(bool part) {
 	else {
 		offsetY += LEGLEN * sin(player.kneeLeftV) + LEGLEN * sin(player.footLeftV);
 	}
-	player.center.y -= offsetY;
-	player.neck.y -= offsetY;
+	if (period.bodyj != JUMPING) {
+		player.center.y -= offsetY;
+		player.neck.y -= offsetY;
+	}
 }
-bool onGround(bool part) {
+bool onGround(enum BODYPART part, int accuracy) {
 	double offsetY = player.center.y - GROUNDHEIGHT - THICKNESS / 2;
 	if (part == RIGHTPART) {
 		offsetY += LEGLEN * sin(player.kneeRightV) + LEGLEN * sin(player.footRightV);
@@ -275,7 +330,7 @@ bool onGround(bool part) {
 	else {
 		offsetY += LEGLEN * sin(player.kneeLeftV) + LEGLEN * sin(player.footLeftV);
 	}
-	if (offsetY <= 1 && offsetY >= -1) {
+	if (offsetY <= accuracy && offsetY >= -accuracy) {
 		return true;
 	}
 	return false;
@@ -327,6 +382,45 @@ void standing() {
 			player.neck.y = player.center.y + 100;
 		}
 		touchGround(RIGHTPART);
+		break;
+	}
+}
+void jumping() {
+	switch (period.bodyj) {
+	case ACCUMULATE:
+		if (period.legs == MOVE || period.legs == END) {
+			player.kneeLeftV += 0.01 * PI;
+			player.kneeRightV += 0.01 * PI;
+			player.footLeftV -= 0.01 * PI;
+			player.footRightV -= 0.01 * PI;
+			touchGround(RIGHTPART);
+		}
+		status.center.x -= 1;//used for counting
+		if (status.center.x <= -10) {
+			period.bodyj = JUMPING;
+			status.center.y = 30;
+			status.neck.y = 30;
+		}
+		break;
+	case JUMPING:
+		status.center.y -= 1;
+		status.neck.y -= 1;
+		if (status.center.x == 0 && onGround(RIGHTPART, 30)) {
+			status.center.y = 0;
+			status.neck.y = 0;
+			period.bodyj = NOTJUMP;
+			touchGround(RIGHTPART);
+			status.center.x = 0;
+		}
+		if (status.center.x < 0) {
+			status.center.x += 1;
+			if (period.legs == MOVE || period.legs == END) {
+				player.kneeLeftV -= 0.01 * PI;
+				player.kneeRightV -= 0.01 * PI;
+				player.footLeftV += 0.01 * PI;
+				player.footRightV += 0.01 * PI;
+			}
+		}
 		break;
 	}
 }
