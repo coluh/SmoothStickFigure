@@ -6,14 +6,14 @@ int main() {
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "StickFigure");
 	SetTraceLogLevel(LOG_WARNING);
 	SetTargetFPS(60);
-	initStick();
+	InitStick();
 	double lastClickTime = 0;
 	while (!WindowShouldClose()) {
-		getInput(&lastClickTime);
-		calculateStick();
+		GetInput(&lastClickTime);
+		CalculateStick();
 		BeginDrawing();
 		ClearBackground(WHITE);
-		drawStick();
+		DrawStick(player);
 		//Ground
 		DrawLine(0, SCREENHEIGHT - GROUNDHEIGHT, SCREENWIDTH, SCREENHEIGHT - GROUNDHEIGHT, RED);
 		DrawText(TextFormat("%d", GetFPS()), 50, 20, 50, RED);
@@ -23,39 +23,39 @@ int main() {
 	return 0;
 }
 
-void getInput(double* lastClickTime) {
+void GetInput(double* lastClickTime) {
 	if (IsKeyPressed(KEY_H)) {
-		punch(LEFTPART);
+		Punch(LEFTPART);
 	}
-	if (IsKeyPressed(KEY_J) && period.leftCut == PUNCH_STILL && (period.armLeft == PUNCH_STILL && (period.armRight == PUNCH_STILL || period.armRight == PUNCH_BACK))) {
-		handKnife();
+	if (IsKeyPressed(KEY_J) && (period.leftCut == HAND_STILL && (period.armLeft == HAND_STILL && (period.armRight == HAND_STILL || period.armRight == HAND_BACK)))) {
+		HandKnife();
 	}
-	if (IsKeyPressed(KEY_K) && period.rightCut == PUNCH_STILL && (period.armRight == PUNCH_STILL && (period.armLeft == PUNCH_STILL || period.armLeft == PUNCH_BACK))) {
-		upperCut();
+	if (IsKeyPressed(KEY_K) && (period.rightCut == HAND_STILL && (period.armRight == HAND_STILL && (period.armLeft == HAND_STILL || period.armLeft == HAND_BACK)))) {
+		UpperCut();
 	}
 	if (IsKeyPressed(KEY_L)) {
-		punch(RIGHTPART);
+		Punch(RIGHTPART);
 	}
 	if (IsKeyPressed(KEY_W)) {
-		lowerHead();
+		LowerHead();
 	}
 	if (IsKeyReleased(KEY_W)) {
-		upperHead();
+		UpperHead();
 	}
 	if (IsKeyPressed(KEY_Q)) {
 		player.center.x -= 500;
 		player.neck.x -= 500;
 	}
 	if (IsKeyPressed(KEY_R)) {
-		initStick();
+		InitStick();
 	}
 	if (IsKeyDown(KEY_D)) {
-		walking(FORWARD);
+		Walking(FORWARD);
 	}
 	else {
 		if (IsKeyDown(KEY_A)) {
-			walking(BACKWARD);
-			walking(BACKWARD);
+			Walking(BACKWARD);
+			Walking(BACKWARD);
 		}
 	}
 	if (IsKeyPressed(KEY_D)) {
@@ -82,17 +82,17 @@ void getInput(double* lastClickTime) {
 	}
 	if (IsKeyUp(KEY_A) && IsKeyUp(KEY_D)) {
 		if (IsKeyDown(KEY_LEFT_SHIFT)) {
-			squating();
+			Squating();
 		}
 		if (IsKeyUp(KEY_LEFT_SHIFT)) {
-			standing();
+			Standing();
 		}
 	}
 	if (IsKeyPressed(KEY_SPACE) && period.bodyj == NOTJUMP) {
 		period.bodyj = ACCUMULATE;
 	}
 }
-void initStick() {
+void InitStick() {
 	player.headV = 0.4 * PI;
 	player.neck = (Vector2){ 210,350 };
 	player.elbowLeftV = 1.6 * PI;
@@ -105,11 +105,11 @@ void initStick() {
 	player.kneeRightV = 1.6 * PI;
 	player.footRightV = 1.55 * PI;
 	player.color = BLACK;
-	touchGround(RIGHTPART);
+	TouchGround(RIGHTPART);
 	/*period.armLeft = STILL;
 	period.armRight = STILL;*/
 }
-void drawStick() {
+void DrawStick(struct STICK player) {
 	/* 只在绘图的时候将y坐标反过来, 程序其它部分按正常坐标习惯 */
 	double headPosX = player.neck.x + ARMLEN / 2 * cos(player.headV);
 	double headPosY = SCREENHEIGHT - (player.neck.y + ARMLEN / 2 * sin(player.headV));
@@ -175,9 +175,9 @@ void drawStick() {
 	DrawCircle(neck.x, neck.y, THICKNESS / 2, player.color);
 	DrawCircle(center.x, center.y, THICKNESS / 2, player.color);
 }
-void calculateStick() {
+void CalculateStick() {
 	//Step 1: Detect edge conditions
-	detectEdge();
+	DetectEdge();
 	//Step 2: Weaken Speed
 	status.headV *= 0.9;
 	status.elbowLeftV *= 0.9;

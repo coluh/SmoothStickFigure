@@ -15,8 +15,8 @@ enum BODYPART {
 enum DIRECTION {
 	BACKWARD, FORWARD
 };
-enum PERIOD_PUNCH {
-	PUNCH_STILL, PUNCH_PULL, PUNCH_HIT, PUNCH_BACK
+enum PERIOD_HAND {
+	HAND_STILL, HAND_PULL, HAND_HIT, HAND_BACK
 };
 enum PERIOD_WALK {
 	MOVE, END, RUNNING, FLYING, FALLING
@@ -28,10 +28,10 @@ enum PERIOD_JUMP {
 	NOTJUMP, ACCUMULATE, JUMPING
 };
 struct PERIOD {
-	enum PERIOD_PUNCH armLeft;
-	enum PERIOD_PUNCH armRight;
-	enum PERIOD_PUNCH leftCut;
-	enum PERIOD_PUNCH rightCut;
+	enum PERIOD_HAND armLeft;
+	enum PERIOD_HAND armRight;
+	enum PERIOD_HAND leftCut;
+	enum PERIOD_HAND rightCut;
 	enum PERIOD_WALK legs;
 	enum PERIOD_SQUAT body;
 	enum PERIOD_JUMP bodyj;
@@ -50,19 +50,21 @@ struct STICK {
 	double footRightV;		/*        |	    */
 	Color color;
 };
-void initStick();
-void drawStick();
-void calculateStick();
-void getInput(double*);
-void punch(enum BODYPART);
-void handKnife();
-void upperCut();
-void lowerHead();
-void upperHead();
-void squating();
-void standing();
-void walking(enum DIRECTION);
-void runningForward();
-void jumping();
-void touchGround(enum BODYPART);
-bool onGround(enum BODYPART, int);
+void InitStick();
+void DrawStick(struct STICK);
+void DetectEdge();
+void CalculateStick();
+void GetInput(double*);
+void Punch(enum BODYPART);
+void HandKnife();
+void UpperCut();
+void LowerHead();
+void UpperHead();
+void Squating();
+void Standing();
+void Walking(enum DIRECTION);
+void RunningForward();
+void Jumping();
+void TouchGround(enum BODYPART);
+bool IsOnGround(enum BODYPART part, int accuracy);
+void DebugPrint();
