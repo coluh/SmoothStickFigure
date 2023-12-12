@@ -427,6 +427,14 @@ void Jumping() {
 		break;
 	}
 }
+void SetDoubleJump() {
+	if (status.color.r == 255) {
+		status.color = BLACK;
+	}
+	else {
+		status.color = WHITE;
+	}
+}
 void DebugPrint() {
 	printf("\nperiod.armLeft: ");
 	switch (period.armLeft) {
@@ -490,4 +498,12 @@ void DebugPrint() {
 	}
 	printf("\nelbowLeftV:%lf\nhandLeftV:%lf\nelbowRightV:%lf\nhandRightV:%lf\n",
 		player.elbowLeftV, player.handLeftV, player.elbowRightV, player.handRightV);
+}
+void CorrectPosture() {
+	/*
+	 * emmmmmm
+	 * arrrrrr
+	 * ixxxxxx
+	 * uhhhhhh
+	 */
 }

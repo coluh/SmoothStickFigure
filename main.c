@@ -5,18 +5,20 @@ struct STICK status = { 0 };	//每帧的变化量
 int main() {
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "StickFigure");
 	SetTraceLogLevel(LOG_WARNING);
-	SetTargetFPS(60);
+	SetTargetFPS(90);
 	InitStick();
 	double lastClickTime = 0;
 	while (!WindowShouldClose()) {
 		GetInput(&lastClickTime);
 		CalculateStick();
+		CorrectPosture();
 		BeginDrawing();
 		ClearBackground(WHITE);
 		DrawStick(player);
 		//Ground
 		DrawLine(0, SCREENHEIGHT - GROUNDHEIGHT, SCREENWIDTH, SCREENHEIGHT - GROUNDHEIGHT, RED);
 		DrawText(TextFormat("%d", GetFPS()), 50, 20, 50, RED);
+		if (status.color.r == 0)DrawText("Double Jump: On", 200, 20, 60, GREEN);
 		EndDrawing();
 	}
 	CloseWindow();
@@ -91,6 +93,15 @@ void GetInput(double* lastClickTime) {
 	if (IsKeyPressed(KEY_SPACE) && period.bodyj == NOTJUMP) {
 		period.bodyj = ACCUMULATE;
 	}
+	if (IsKeyPressed(KEY_SPACE) && (status.color.r == 0 && period.bodyj == JUMPING)) {
+		status.center.y = 30;
+		status.neck.y = 30;
+
+	}
+	if (IsKeyPressed(KEY_B)) {
+		SetDoubleJump();
+	}
+
 }
 void InitStick() {
 	player.headV = 0.4 * PI;
@@ -104,7 +115,8 @@ void InitStick() {
 	player.footLeftV = 1.4 * PI;
 	player.kneeRightV = 1.6 * PI;
 	player.footRightV = 1.55 * PI;
-	player.color = BLACK;
+	player.color = SKYBLUE;
+	status.color = WHITE;
 	TouchGround(RIGHTPART);
 	/*period.armLeft = STILL;
 	period.armRight = STILL;*/

@@ -5,7 +5,7 @@
 #include <raymath.h>
 #define ARMLEN 80
 #define LEGLEN 100
-#define THICKNESS 12		//maybe 20 is like Alan's
+#define THICKNESS 20		//maybe 20 is like Alan's
 #define SCREENWIDTH 2100
 #define SCREENHEIGHT 900
 #define GROUNDHEIGHT 40
@@ -68,3 +68,5 @@ void Jumping();
 void TouchGround(enum BODYPART);
 bool IsOnGround(enum BODYPART part, int accuracy);
 void DebugPrint();
+void SetDoubleJump();
+void CorrectPosture();
