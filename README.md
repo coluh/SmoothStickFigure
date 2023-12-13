@@ -1,2 +1,5 @@
 # SmoothStickFigure
-stick figures move smoothly
+
+Trying to make stick figures move smoothly.
+
+use Raylib.
