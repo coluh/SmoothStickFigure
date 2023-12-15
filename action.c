@@ -312,6 +312,37 @@ void Walking(enum DIRECTION direction) {
 		break;
 	}
 }
+void WalkingSquating(enum DIRECTION direction) {
+	player.kneeLeftV += 0.0017 * PI;
+	player.footLeftV += 0.0031 * PI;
+	player.kneeRightV -= 0.0017 * PI;
+	player.footRightV -= 0.0031 * PI;
+	if (player.kneeLeftV >= 2 * PI)
+		player.kneeLeftV -= 2 * PI;
+	if (direction == FORWARD) {
+		player.center.x +=	1;
+		player.neck.x +=	1;
+		if (player.kneeLeftV > 0.02 * PI && player.kneeLeftV < 0.1 * PI) {
+			player.kneeLeftV = 1.85 * PI;
+			player.footLeftV = 1.14 * PI;
+			player.kneeRightV = 0.02 * PI;
+			player.footRightV = 1.45 * PI;
+		}
+	}
+	else {
+		player.center.x -= 1;
+		player.neck.x -= 1;
+		if (player.kneeLeftV > 0.02 * PI && player.kneeLeftV < 0.1 * PI) {
+			player.kneeLeftV = 1.85 * PI;
+			player.footLeftV = 1.14 * PI;
+			player.kneeRightV = 0.02 * PI;
+			player.footRightV = 1.45 * PI;
+		}
+	}
+	if (period.bodyj != ACCUMULATE) {
+		TouchGround(RIGHTPART);
+	}
+}
 void TouchGround(enum BODYPART part) {
 	double offsetY = player.center.y - GROUNDHEIGHT - THICKNESS / 2;
 	if (part == RIGHTPART) {

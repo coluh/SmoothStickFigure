@@ -15,18 +15,20 @@ int main() {
 		friend.headV = 0.6 * PI;
 		friend.elbowLeftV = 1.4 * PI;
 		friend.handLeftV = 0.6 * PI;
-		friend.elbowRightV = 1.6 * PI;
-		friend.handRightV = 0.7 * PI;
+		friend.elbowRightV = 1 * PI;//Right Hit
+		friend.handRightV = 1 * PI;//Right Hit
 		friend.kneeLeftV = 1.55 * PI;
 		friend.footLeftV = 1.6 * PI;
 		friend.kneeRightV = 1.4 * PI;
 		friend.footRightV = 1.45 * PI;
 		friend.color = RED;
+		//speed
 	} while (0);
 	double lastClickTime = 0;
 	while (!WindowShouldClose()) {
 		GetInput(&lastClickTime);
 		CalculateStick();
+		CalculateHit(NULL);
 		CorrectPosture();
 		BeginDrawing();
 		ClearBackground(WHITE);
@@ -69,12 +71,21 @@ void GetInput(double* lastClickTime) {
 		InitStick();
 	}
 	if (IsKeyDown(KEY_D)) {
-		Walking(FORWARD);
+		if (period.body == SQUATING)
+			WalkingSquating(FORWARD);
+		else
+			Walking(FORWARD);
 	}
 	else {
 		if (IsKeyDown(KEY_A)) {
-			Walking(BACKWARD);
-			Walking(BACKWARD);
+			if (period.body != SQUATING) {
+				Walking(BACKWARD);
+				Walking(BACKWARD);
+			}
+			else {
+				WalkingSquating(BACKWARD);
+				WalkingSquating(BACKWARD);
+			}
 		}
 	}
 	if (IsKeyPressed(KEY_D)) {
@@ -221,4 +232,7 @@ void CalculateStick() {
 	player.handRightV += status.handRightV;
 	player.center.y += status.center.y;
 	player.neck.y += status.neck.y;
+}
+void CalculateHit(struct PERIOD* p) {
+	//
 }
