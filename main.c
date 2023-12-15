@@ -7,6 +7,22 @@ int main() {
 	SetTraceLogLevel(LOG_WARNING);
 	SetTargetFPS(90);
 	InitStick();
+	struct STICK friend = { 0 };
+	//¡Ÿ ±º”…œ:
+	do{
+		friend.center = (Vector2){ 1700, 250 };
+		friend.neck = (Vector2){ 1690, 350 };
+		friend.headV = 0.6 * PI;
+		friend.elbowLeftV = 1.4 * PI;
+		friend.handLeftV = 0.6 * PI;
+		friend.elbowRightV = 1.6 * PI;
+		friend.handRightV = 0.7 * PI;
+		friend.kneeLeftV = 1.55 * PI;
+		friend.footLeftV = 1.6 * PI;
+		friend.kneeRightV = 1.4 * PI;
+		friend.footRightV = 1.45 * PI;
+		friend.color = RED;
+	} while (0);
 	double lastClickTime = 0;
 	while (!WindowShouldClose()) {
 		GetInput(&lastClickTime);
@@ -15,6 +31,7 @@ int main() {
 		BeginDrawing();
 		ClearBackground(WHITE);
 		DrawStick(player);
+		DrawStick(friend);
 		//Ground
 		DrawLine(0, SCREENHEIGHT - GROUNDHEIGHT, SCREENWIDTH, SCREENHEIGHT - GROUNDHEIGHT, RED);
 		DrawText(TextFormat("%d", GetFPS()), 50, 20, 50, RED);
